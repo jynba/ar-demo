@@ -1,0 +1,22 @@
+{
+  "name": "ar-demo",
+  "version": "1.0.0",
+  "main": "index.html",
+  "scripts": {
+    "deploy": "gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jynba/ar-demo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jynba/ar-demo/issues"
+  },
+  "homepage": "https://github.com/jynba/ar-demo#readme",
+  "description": "",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}
