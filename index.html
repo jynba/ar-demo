@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>WebAR NFT Demo</title>
+    <!-- A-Frame -->
+    <script src="https://unpkg.com/aframe@1.0.4/dist/aframe.min.js"></script>
+    <!-- AR.js for A-Frame (NFT tracking) -->
+    <script src="https://unpkg.com/@ar-js-org/ar.js@3.4.4/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+      .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .arjs-loader div {
+        text-align: center;
+        font-size: 1.25em;
+        color: white;
+      }
+    </style>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <!-- Loader -->
+    <div class="arjs-loader">
+      <div>Loading, please wait...</div>
+    </div>
+
+    <a-scene
+      vr-mode-ui="enabled: false;"
+      renderer="logarithmicDepthBuffer: true;"
+      embedded
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+    >
+      <!-- NFT Marker: T-Rex example -->
+      <a-nft
+        type="nft"
+        url="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+        smooth="true"
+        smoothCount="10"
+        smoothTolerance="0.01"
+        smoothThreshold="5"
+      >
+        <!-- GLTF 3D Model -->
+        <a-entity
+          gltf-model="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/examples/image-tracking/nft/trex/scene.gltf"
+          scale="5 5 5"
+          position="100 100 0"
+        ></a-entity>
+      </a-nft>
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
