@@ -2,60 +2,68 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>WebAR NFT Demo</title>
-    <!-- A-Frame -->
-    <script src="https://unpkg.com/aframe@1.0.4/dist/aframe.min.js"></script>
-    <!-- AR.js for A-Frame (NFT tracking) -->
-    <script src="https://unpkg.com/@ar-js-org/ar.js@3.4.4/aframe/build/aframe-ar-nft.js"></script>
+    <title>动态 NFT Marker AR</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js"></script>
     <style>
-      .arjs-loader {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: rgba(0, 0, 0, 0.8);
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .arjs-loader div {
-        text-align: center;
-        font-size: 1.25em;
-        color: white;
+      body { margin: 0; font-family: sans-serif; }
+      #input-panel {
+        position: absolute; top: 20px; left: 20px; background: white;
+        padding: 20px; border-radius: 8px; z-index: 999;
       }
     </style>
   </head>
-  <body style="margin: 0; overflow: hidden;">
-    <!-- Loader -->
-    <div class="arjs-loader">
-      <div>Loading, please wait...</div>
+  <body>
+    <!-- 输入面板 -->
+    <div id="input-panel">
+      <label>NFT Marker URL: <input type="text" id="markerUrl" placeholder="nft/sample" /></label><br/><br/>
+      <label>Model URL (gltf): <input type="text" id="modelUrl" placeholder="model/scene.gltf" /></label><br/><br/>
+      <button onclick="startAR()">下一步</button>
     </div>
 
-    <a-scene
-      vr-mode-ui="enabled: false;"
-      renderer="logarithmicDepthBuffer: true;"
-      embedded
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-    >
-      <!-- NFT Marker: T-Rex example -->
-      <a-nft
-        type="nft"
-        url="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/examples/image-tracking/nft/trex/trex-image/trex"
-        smooth="true"
-        smoothCount="10"
-        smoothTolerance="0.01"
-        smoothThreshold="5"
-      >
-        <!-- GLTF 3D Model -->
-        <a-entity
-          gltf-model="http://cdn.jsdelivr.net/npm/jy-model/yasuo.glb"
-          scale="5 5 5"
-          position="100 100 0"
-        ></a-entity>
-      </a-nft>
-      <a-entity camera></a-entity>
-    </a-scene>
+    <!-- AR 场景容器 -->
+    <div id="scene-container"></div>
+
+    <script>
+      function startAR() {
+        const markerUrl = document.getElementById('markerUrl').value.trim();
+        const modelUrl = document.getElementById('modelUrl').value.trim();
+
+        if (!markerUrl || !modelUrl) {
+          alert('请输入完整的 Marker 和模型地址！');
+          return;
+        }
+
+        // 隐藏输入面板
+        document.getElementById('input-panel').style.display = 'none';
+
+        // 创建 A-Frame AR 场景
+        const scene = document.createElement('a-scene');
+        scene.setAttribute('embedded', '');
+        scene.setAttribute('arjs', 'trackingMethod: best; sourceType: webcam; debugUIEnabled: false;');
+
+        const nft = document.createElement('a-nft');
+        nft.setAttribute('type', 'nft');
+        nft.setAttribute('url', markerUrl);
+        nft.setAttribute('smooth', 'true');
+        nft.setAttribute('smoothCount', '10');
+        nft.setAttribute('smoothTolerance', '0.01');
+        nft.setAttribute('smoothThreshold', '5');
+
+        const model = document.createElement('a-entity');
+        model.setAttribute('gltf-model', modelUrl);
+        model.setAttribute('position', '0 0 0');
+        model.setAttribute('scale', '1 1 1');
+
+        nft.appendChild(model);
+        scene.appendChild(nft);
+
+        const camera = document.createElement('a-entity');
+        camera.setAttribute('camera', '');
+        scene.appendChild(camera);
+
+        document.getElementById('scene-container').appendChild(scene);
+      }
+    </script>
   </body>
 </html>
