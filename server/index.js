@@ -350,8 +350,9 @@ function parseQuality(stdout = '') {
   };
 }
 
-function buildViewerHtml(targetPrefixUrl) {
+function buildViewerHtml(targetPrefixUrl, sourceImageUrl = '') {
   const normalizedTargetPrefix = String(targetPrefixUrl || '').replace(/^\/+/, '');
+  const normalizedSourceImageUrl = String(sourceImageUrl || '').replace(/"/g, '&quot;');
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -410,12 +411,25 @@ function buildViewerHtml(targetPrefixUrl) {
         smoothTolerance="0.01"
         smoothThreshold="5"
       >
-        <a-entity
-          gltf-model="${MODEL_URL}"
-          scale="5 5 5"
-          position="100 100 100"
-          rotation="-90 0 0"
-        ></a-entity>
+        <a-entity position="100 100 100" rotation="-90 0 0">
+          <a-entity
+            gltf-model="${MODEL_URL}"
+            scale="5 5 5"
+            position="0 0 0"
+          ></a-entity>
+          ${normalizedSourceImageUrl
+      ? `<a-plane
+            src="${normalizedSourceImageUrl}"
+            position="100 100 0"
+            rotation="0 0 0"
+            width="100"
+            height="100"
+            transparent="true"
+            material="side: double"
+          ></a-plane>`
+      : ''
+    }
+        </a-entity>
       </a-nft>
       <a-entity camera></a-entity>
     </a-scene>
@@ -583,7 +597,7 @@ async function route(req, res) {
   if (req.method === 'GET' && pathname.startsWith('/viewer/')) {
     const viewerId = pathname.replace('/viewer/', '');
     if (viewerId === 'static-trex') {
-      const html = buildViewerHtml('asset/trex');
+      const html = buildViewerHtml('asset/trex', 'asset/test.jpg');
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
       return res.end(html);
     }
@@ -594,7 +608,10 @@ async function route(req, res) {
       return sendText(res, 404, 'Viewer task not found or not ready yet.');
     }
 
-    const html = buildViewerHtml(meta.target_prefix_path || buildTargetPrefixPath(taskId));
+    const html = buildViewerHtml(
+      meta.target_prefix_path || buildTargetPrefixPath(taskId),
+      meta.files?.source_original || meta.files?.source || '',
+    );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
     return res.end(html);
   }
