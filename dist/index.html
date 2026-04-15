@@ -1,61 +1,298 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>WebAR NFT Demo</title>
-    <!-- A-Frame -->
-    <script src="https://unpkg.com/aframe@1.0.4/dist/aframe.min.js"></script>
-    <!-- AR.js for A-Frame (NFT tracking) -->
-    <script src="https://unpkg.com/@ar-js-org/ar.js@3.4.4/aframe/build/aframe-ar-nft.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dynamic Trex Target Lab</title>
     <style>
-      .arjs-loader {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: rgba(0, 0, 0, 0.8);
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      :root {
+        color-scheme: light;
+        --bg: #f5f1e8;
+        --panel: rgba(255, 255, 255, 0.9);
+        --line: #d6ccb8;
+        --text: #2f261d;
+        --muted: #6b6257;
+        --accent: #8b5e3c;
+        --accent-strong: #6b4021;
       }
-      .arjs-loader div {
-        text-align: center;
-        font-size: 1.25em;
-        color: white;
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "PingFang SC", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(218, 185, 136, 0.35), transparent 30%),
+          linear-gradient(160deg, #f7f2e7 0%, #efe2c9 100%);
+      }
+      main {
+        width: min(960px, calc(100% - 32px));
+        margin: 32px auto 56px;
+      }
+      .hero,
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: 0 18px 60px rgba(69, 41, 16, 0.08);
+        backdrop-filter: blur(10px);
+      }
+      .hero {
+        padding: 28px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(30px, 6vw, 52px);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+      .hero p,
+      .hint,
+      .result-meta,
+      li {
+        color: var(--muted);
+      }
+      .hero p {
+        max-width: 720px;
+        margin: 0;
+        line-height: 1.6;
+      }
+      .grid {
+        display: grid;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      @media (min-width: 860px) {
+        .grid {
+          grid-template-columns: 1.1fr 0.9fr;
+        }
+      }
+      .panel {
+        padding: 22px;
+      }
+      .label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+      }
+      .field,
+      .button,
+      .file {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        font: inherit;
+      }
+      .field,
+      .file {
+        padding: 14px 16px;
+        background: #fff;
+      }
+      .button {
+        appearance: none;
+        border: none;
+        padding: 15px 18px;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+        color: #fff;
+        font-weight: 700;
+      }
+      .button[disabled] {
+        opacity: 0.55;
+        cursor: wait;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+      .actions .button {
+        flex: 1 1 180px;
+      }
+      .secondary {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+      .result {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px dashed var(--line);
+        background: rgba(255, 255, 255, 0.75);
+      }
+      .result a {
+        color: var(--accent-strong);
+      }
+      .hint {
+        margin-top: 12px;
+        line-height: 1.6;
+      }
+      .status {
+        margin-top: 12px;
+        min-height: 24px;
+        font-weight: 600;
+      }
+      code {
+        padding: 2px 6px;
+        border-radius: 8px;
+        background: rgba(107, 64, 33, 0.08);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      ul {
+        margin: 16px 0 0;
+        padding-left: 18px;
       }
     </style>
   </head>
-  <body style="margin: 0; overflow: hidden;">
-    <!-- Loader -->
-    <div class="arjs-loader">
-      <div>Loading, please wait...</div>
-    </div>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>Dynamic Trex Target Lab</h1>
+        <p>
+          Upload a JPG/PNG or provide an image URL, let the local Node service generate a dedicated
+          AR.js NFT target, then open the viewer to verify the image can trigger the fixed Trex model.
+        </p>
+      </section>
 
-    <a-scene
-      vr-mode-ui="enabled: false;"
-      renderer="logarithmicDepthBuffer: true;"
-      embedded
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-    >
-      <!-- NFT Marker: T-Rex example -->
-      <a-nft
-        type="nft"
-        url="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/examples/image-tracking/nft/trex/trex-image/trex"
-        smooth="true"
-        smoothCount="10"
-        smoothTolerance="0.01"
-        smoothThreshold="5"
-      >
-        <!-- GLTF 3D Model -->
-        <a-entity
-          gltf-model="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/examples/image-tracking/nft/trex/scene.gltf"
-          scale="5 5 5"
-          position="100 100 0"
-        ></a-entity>
-      </a-nft>
-      <a-entity camera></a-entity>
-    </a-scene>
+      <div class="grid">
+        <section class="panel">
+          <form id="target-form">
+            <label class="label" for="image-url">Image URL</label>
+            <input
+              id="image-url"
+              class="field"
+              type="url"
+              name="image_url"
+              placeholder="https://example.com/result.jpg"
+            />
+
+            <p class="hint">Or upload a local JPG/PNG file.</p>
+
+            <label class="label" for="image-file">Image File</label>
+            <input id="image-file" class="file" type="file" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+
+            <div class="actions">
+              <button class="button" id="submit-button" type="submit">Generate Dynamic Target</button>
+              <button class="button secondary" id="sample-button" type="button">Use Built-in Sample</button>
+            </div>
+
+            <div class="status" id="status"></div>
+          </form>
+
+          <div class="result" id="result" hidden></div>
+        </section>
+
+        <aside class="panel">
+          <strong>Verification notes</strong>
+          <ul>
+            <li>POC keeps the AR content fixed to the Trex model. Only the target image changes.</li>
+            <li>Best target images have strong corners, texture, and contrast.</li>
+            <li>If you print the image, avoid glare, blur, and tight crops.</li>
+          </ul>
+          <p class="hint">
+            Built-in sample URL:
+            <code id="sample-url"></code>
+          </p>
+          <p class="hint">
+            Static Trex sanity check:
+            <a href="/viewer/static-trex" target="_blank" rel="noreferrer">open static viewer</a>
+          </p>
+        </aside>
+      </div>
+    </main>
+
+    <script>
+      const form = document.getElementById('target-form');
+      const imageUrlInput = document.getElementById('image-url');
+      const imageFileInput = document.getElementById('image-file');
+      const submitButton = document.getElementById('submit-button');
+      const sampleButton = document.getElementById('sample-button');
+      const result = document.getElementById('result');
+      const status = document.getElementById('status');
+      const sampleUrl = new URL('/asset/test.jpg', window.location.origin).toString();
+      document.getElementById('sample-url').textContent = sampleUrl;
+
+      const setBusy = (busy, text = '') => {
+        submitButton.disabled = busy;
+        sampleButton.disabled = busy;
+        status.textContent = text;
+      };
+
+      const renderResult = (data) => {
+        result.hidden = false;
+        const quality = data.quality
+          ? `<div class="result-meta"><strong>Quality:</strong> confidence ${data.quality.confidence}/5, entropy ${data.quality.entropy}</div>`
+          : '';
+        result.innerHTML = `
+          <div><strong>Task:</strong> <code>${data.task_id}</code></div>
+          <div class="result-meta"><strong>Status:</strong> ${data.status}</div>
+          ${quality}
+          <div><strong>Viewer:</strong> <a href="${data.viewer_url}" target="_blank" rel="noreferrer">${data.viewer_url}</a></div>
+          <div><strong>Target Prefix:</strong> <a href="${data.target_prefix_url}.iset" target="_blank" rel="noreferrer">${data.target_prefix_url}</a></div>
+        `;
+      };
+
+      const submitJson = async (payload) => {
+        const response = await fetch('/api/targets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        return response.json();
+      };
+
+      const submitFile = async (file) => {
+        const data = new FormData();
+        data.append('image', file);
+        const response = await fetch('/api/targets', {
+          method: 'POST',
+          body: data,
+        });
+        return response.json();
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const imageUrl = imageUrlInput.value.trim();
+        const file = imageFileInput.files[0];
+
+        if (!imageUrl && !file) {
+          status.textContent = 'Provide an image URL or choose a JPG/PNG file first.';
+          return;
+        }
+
+        setBusy(true, 'Generating NFT descriptors...');
+        result.hidden = true;
+        try {
+          const payload = file ? await submitFile(file) : await submitJson({ image_url: imageUrl });
+          if (!payload.ok) {
+            throw new Error(payload.error || 'Target generation failed.');
+          }
+          renderResult(payload);
+          setBusy(false, 'Target generated. Open the viewer and scan the same image.');
+        } catch (error) {
+          setBusy(false, error.message || 'Target generation failed.');
+        }
+      });
+
+      sampleButton.addEventListener('click', async () => {
+        setBusy(true, 'Generating target from built-in sample...');
+        result.hidden = true;
+        try {
+          const payload = await submitJson({ image_url: sampleUrl });
+          if (!payload.ok) {
+            throw new Error(payload.error || 'Target generation failed.');
+          }
+          renderResult(payload);
+          setBusy(false, 'Sample target generated. Open the viewer to test.');
+        } catch (error) {
+          setBusy(false, error.message || 'Target generation failed.');
+        }
+      });
+    </script>
   </body>
 </html>

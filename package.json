@@ -1,8 +1,10 @@
 {
   "name": "ar-demo",
   "version": "1.0.0",
-  "main": "index.html",
+  "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
     "deploy": "gh-pages -d dist"
   },
   "repository": {
